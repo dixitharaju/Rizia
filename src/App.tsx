@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { LocationModal } from './components/LocationModal';
 import { useDarkMode } from './hooks/useDarkMode';
+import * as api from './utils/api';
 import Home from './pages/Home';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -27,17 +28,34 @@ import Checkout from './pages/Checkout';
 export default function App() {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   useEffect(() => {
+    // Initialize data on first load
+    const initData = async () => {
+      try {
+        await api.initializeData();
+        setIsInitialized(true);
+      } catch (error) {
+        console.log('Data already initialized or error:', error);
+        setIsInitialized(true);
+      }
+    };
+
+    initData();
+
     // Check for existing user session
+    const savedToken = localStorage.getItem('accessToken');
     const savedUser = localStorage.getItem('user');
     const savedIsAdmin = localStorage.getItem('isAdmin');
     const savedCity = localStorage.getItem('selectedCity');
     
-    if (savedUser) {
+    if (savedToken && savedUser) {
+      setAccessToken(savedToken);
       setUser(JSON.parse(savedUser));
       setIsAdmin(savedIsAdmin === 'true');
     }
@@ -50,17 +68,29 @@ export default function App() {
     }
   }, []);
 
-  const handleLogin = (userData, adminStatus = false) => {
+  const handleLogin = (userData, token, adminStatus = false) => {
     setUser(userData);
+    setAccessToken(token);
     setIsAdmin(adminStatus);
     localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('accessToken', token);
     localStorage.setItem('isAdmin', adminStatus.toString());
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      if (accessToken) {
+        await api.signout(accessToken);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
     setUser(null);
+    setAccessToken(null);
     setIsAdmin(false);
     localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
     localStorage.removeItem('isAdmin');
   };
 
@@ -69,6 +99,9 @@ export default function App() {
     localStorage.setItem('selectedCity', city);
     setShowLocationModal(false);
   };
+
+  // Pass access token to all components that need it
+  const userWithToken = user ? { ...user, accessToken } : null;
 
   return (
     <>
@@ -80,33 +113,33 @@ export default function App() {
       
       <Router>
         <Routes>
-          <Route path="/" element={<Home user={user} selectedCity={selectedCity} onChangeCity={() => setShowLocationModal(true)} />} />
+          <Route path="/" element={<Home user={userWithToken} selectedCity={selectedCity} onChangeCity={() => setShowLocationModal(true)} />} />
           <Route path="/signup" element={user ? <Navigate to={isAdmin ? "/admin/dashboard" : "/dashboard"} /> : <Signup onSignup={handleLogin} />} />
           <Route path="/login" element={user ? <Navigate to={isAdmin ? "/admin/dashboard" : "/dashboard"} /> : <Login onLogin={handleLogin} />} />
-          <Route path="/dashboard" element={user && !isAdmin ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} />
-          <Route path="/competitions" element={<Competitions user={user} selectedCity={selectedCity} onChangeCity={() => setShowLocationModal(true)} />} />
-          <Route path="/competition/:id" element={<CompetitionDetails user={user} />} />
-          <Route path="/registration-confirmation/:id" element={user ? <RegistrationConfirmation user={user} /> : <Navigate to="/login" />} />
-          <Route path="/submission/:id" element={user ? <Submission user={user} /> : <Navigate to="/login" />} />
-          <Route path="/submission-success" element={user ? <SubmissionSuccess user={user} /> : <Navigate to="/login" />} />
-          <Route path="/my-submissions" element={user ? <MySubmissions user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} />
-          <Route path="/account-settings" element={user ? <AccountSettings user={user} onLogout={handleLogout} onUpdateUser={handleLogin} /> : <Navigate to="/login" />} />
+          <Route path="/dashboard" element={user && !isAdmin ? <Dashboard user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/competitions" element={<Competitions user={userWithToken} selectedCity={selectedCity} onChangeCity={() => setShowLocationModal(true)} />} />
+          <Route path="/competition/:id" element={<CompetitionDetails user={userWithToken} />} />
+          <Route path="/registration-confirmation/:id" element={user ? <RegistrationConfirmation user={userWithToken} /> : <Navigate to="/login" />} />
+          <Route path="/submission/:id" element={user ? <Submission user={userWithToken} /> : <Navigate to="/login" />} />
+          <Route path="/submission-success" element={user ? <SubmissionSuccess user={userWithToken} /> : <Navigate to="/login" />} />
+          <Route path="/my-submissions" element={user ? <MySubmissions user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/account-settings" element={user ? <AccountSettings user={userWithToken} onLogout={handleLogout} onUpdateUser={handleLogin} /> : <Navigate to="/login" />} />
           
           {/* Admin Routes */}
-          <Route path="/admin/dashboard" element={isAdmin ? <AdminDashboard onLogout={handleLogout} /> : <Navigate to="/login" />} />
-          <Route path="/admin/manage-competitions" element={isAdmin ? <ManageCompetitions onLogout={handleLogout} /> : <Navigate to="/login" />} />
-          <Route path="/admin/review-submissions/:id" element={isAdmin ? <ReviewSubmissions onLogout={handleLogout} /> : <Navigate to="/login" />} />
-          <Route path="/admin/all-bookings" element={isAdmin ? <AllBookings onLogout={handleLogout} /> : <Navigate to="/login" />} />
-          <Route path="/admin/bookings" element={isAdmin ? <AllBookings onLogout={handleLogout} /> : <Navigate to="/login" />} />
-          <Route path="/admin/analytics" element={isAdmin ? <Analytics onLogout={handleLogout} /> : <Navigate to="/login" />} />
-          <Route path="/admin/users-management" element={isAdmin ? <UsersManagement onLogout={handleLogout} /> : <Navigate to="/login" />} />
-          <Route path="/admin/users" element={isAdmin ? <UsersManagement onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/admin/dashboard" element={isAdmin ? <AdminDashboard user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/admin/manage-competitions" element={isAdmin ? <ManageCompetitions user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/admin/review-submissions/:id" element={isAdmin ? <ReviewSubmissions user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/admin/all-bookings" element={isAdmin ? <AllBookings user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/admin/bookings" element={isAdmin ? <AllBookings user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/admin/analytics" element={isAdmin ? <Analytics user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/admin/users-management" element={isAdmin ? <UsersManagement user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+          <Route path="/admin/users" element={isAdmin ? <UsersManagement user={userWithToken} onLogout={handleLogout} /> : <Navigate to="/login" />} />
           
           {/* Additional Routes */}
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/help" element={<Help />} />
-          <Route path="/checkout/:id" element={user ? <Checkout user={user} /> : <Navigate to="/login" />} />
+          <Route path="/checkout/:id" element={user ? <Checkout user={userWithToken} /> : <Navigate to="/login" />} />
         </Routes>
       </Router>
     </>

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { CompetitionCard } from '../components/CompetitionCard';
 import { HeroCarousel } from '../components/HeroCarousel';
-import { mockEvents, getEventsByCity } from '../data/mockData';
+import * as api from '../utils/api';
 import { Sparkles, Trophy, Users, Award, ArrowRight, Star, CheckCircle, Calendar, DollarSign, Ticket, MapPin, Zap, Heart, TrendingUp } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 
@@ -14,6 +15,26 @@ interface HomeProps {
 }
 
 export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const fetchedEvents = await api.getEvents(selectedCity || undefined);
+        setEvents(fetchedEvents || []);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        setEvents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [selectedCity]);
+
   const categories = [
     { 
       name: 'Concert', 
@@ -68,8 +89,8 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
 
   // Filter events by selected city
   const displayEvents = selectedCity 
-    ? getEventsByCity(selectedCity).slice(0, 6)
-    : mockEvents.slice(0, 6);
+    ? events.filter(e => e).slice(0, 6)
+    : events.filter(e => e).slice(0, 6);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900">

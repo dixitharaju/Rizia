@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { getEventById } from '../data/mockData';
+import * as api from '../utils/api';
+import { Event } from '../data/mockData';
 import { CreditCard, Lock, CheckCircle, Calendar, MapPin, Ticket, User, Mail, Phone, Shield } from 'lucide-react';
 
 interface CheckoutProps {
@@ -12,11 +13,12 @@ interface CheckoutProps {
 export default function Checkout({ user }: CheckoutProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const event = id ? getEventById(id) : null;
-
+  const [event, setEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(1);
   const [ticketCount, setTicketCount] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [processing, setProcessing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -27,8 +29,31 @@ export default function Checkout({ user }: CheckoutProps) {
     upiId: ''
   });
 
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (!id) return;
+      try {
+        const eventData = await api.getEventById(id);
+        setEvent(eventData);
+      } catch (error) {
+        console.error('Error fetching event:', error);
+        navigate('/competitions');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvent();
+  }, [id, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
   if (!event) {
-    navigate('/competitions');
     return null;
   }
 
@@ -37,15 +62,37 @@ export default function Checkout({ user }: CheckoutProps) {
   const convenienceFee = Math.round(subtotal * 0.05);
   const total = subtotal + convenienceFee;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step === 1) {
       setStep(2);
     } else if (step === 2) {
-      // Process payment
-      setTimeout(() => {
-        navigate(`/registration-confirmation/${id}`);
-      }, 1500);
+      // Process payment and create booking
+      setProcessing(true);
+      try {
+        const bookingData = {
+          userId: user.id,
+          eventId: event.id,
+          eventName: event.title,
+          ticketCount,
+          totalAmount: `₹${total}`,
+          contactName: formData.name,
+          contactEmail: formData.email,
+          contactPhone: formData.phone,
+          paymentMethod,
+        };
+
+        await api.createBooking(user.accessToken, bookingData);
+        
+        setTimeout(() => {
+          navigate(`/registration-confirmation/${id}`);
+        }, 1000);
+      } catch (error) {
+        console.error('Booking error:', error);
+        alert('Failed to complete booking. Please try again.');
+      } finally {
+        setProcessing(false);
+      }
     }
   };
 

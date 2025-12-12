@@ -1,7 +1,8 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { getEventById, isUserRegistered, registerForEvent } from '../data/mockData';
+import * as api from '../utils/api';
 import { Calendar, Award, CheckCircle, ArrowLeft, MapPin, Clock, Ticket, Users, Shield, Heart } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 
@@ -12,9 +13,42 @@ interface CompetitionDetailsProps {
 export default function CompetitionDetails({ user }: CompetitionDetailsProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const event = id ? getEventById(id) : null;
+  const [event, setEvent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   
-  const isRegistered = user && id ? isUserRegistered(user.id, id) : false;
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (!id) return;
+      
+      try {
+        setLoading(true);
+        const fetchedEvent = await api.getEventById(id);
+        setEvent(fetchedEvent);
+      } catch (error) {
+        console.error('Error fetching event:', error);
+        setEvent(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900">
+        <Header user={user} />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center">
+            <div className="text-6xl mb-4">⏳</div>
+            <h1 className="text-gray-900 mb-4">Loading...</h1>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!event) {
     return (
@@ -95,12 +129,7 @@ export default function CompetitionDetails({ user }: CompetitionDetailsProps) {
                   <span className={`px-4 py-2 rounded-full text-sm text-white bg-gradient-to-r ${getCategoryGradient(event.category)} shadow-lg`}>
                     {event.category}
                   </span>
-                  {isRegistered && (
-                    <span className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-full shadow-lg">
-                      <CheckCircle size={18} />
-                      <span className="text-sm">Booked</span>
-                    </span>
-                  )}
+                  {/* Booked status removed - booking info will be tracked in backend */}
                 </div>
                 <h1 className="text-white text-4xl md:text-5xl mb-4">{event.title}</h1>
                 <div className="flex flex-wrap gap-4 text-white">
@@ -186,28 +215,13 @@ export default function CompetitionDetails({ user }: CompetitionDetailsProps) {
                   <p className="text-gray-600 dark:text-gray-400 text-sm">per ticket</p>
                 </div>
 
-                {isRegistered ? (
-                  <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 border border-green-200 dark:border-green-800 rounded-2xl p-4 text-green-800 dark:text-green-300 text-center">
-                      <CheckCircle size={24} className="mx-auto mb-2" />
-                      <p>You have booked this event!</p>
-                    </div>
-                    <Link
-                      to="/my-submissions"
-                      className="block w-full text-center py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white rounded-2xl hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transition-all shadow-lg hover:shadow-xl"
-                    >
-                      View My Bookings
-                    </Link>
-                  </div>
-                ) : (
-                  <button
-                    onClick={handleBookNow}
-                    className="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white rounded-2xl hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg"
-                  >
-                    <Ticket size={22} />
-                    Book Now
-                  </button>
-                )}
+                <button
+                  onClick={handleBookNow}
+                  className="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white rounded-2xl hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg"
+                >
+                  <Ticket size={22} />
+                  Book Now
+                </button>
 
                 {!user && (
                   <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">

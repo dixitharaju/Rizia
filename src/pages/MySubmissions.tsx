@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { getUserSubmissions } from '../data/mockData';
+import * as api from '../utils/api';
 import { FileText, Clock, CheckCircle, XCircle, AlertCircle, Trash2, Edit } from 'lucide-react';
 
 interface MySubmissionsProps {
@@ -11,7 +11,27 @@ interface MySubmissionsProps {
 }
 
 export default function MySubmissions({ user, onLogout }: MySubmissionsProps) {
-  const [submissions, setSubmissions] = useState(getUserSubmissions(user.id));
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSubmissions = async () => {
+      if (!user?.id || !user?.accessToken) return;
+
+      try {
+        setLoading(true);
+        const fetchedSubmissions = await api.getUserSubmissions(user.accessToken, user.id);
+        setSubmissions(fetchedSubmissions || []);
+      } catch (error) {
+        console.error('Error fetching submissions:', error);
+        setSubmissions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubmissions();
+  }, [user]);
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -63,7 +83,15 @@ export default function MySubmissions({ user, onLogout }: MySubmissionsProps) {
         <div className="container mx-auto max-w-6xl">
           <h1 className="text-gray-900 mb-8">My Submissions</h1>
 
-          {submissions.length === 0 ? (
+          {loading ? (
+            <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+              <FileText className="mx-auto text-gray-400 mb-4" size={64} />
+              <h2 className="text-gray-900 mb-2">Loading Submissions</h2>
+              <p className="text-gray-600 mb-6">
+                Please wait while we load your submissions.
+              </p>
+            </div>
+          ) : submissions.length === 0 ? (
             <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
               <FileText className="mx-auto text-gray-400 mb-4" size={64} />
               <h2 className="text-gray-900 mb-2">No Submissions Yet</h2>

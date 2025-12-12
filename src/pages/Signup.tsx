@@ -2,14 +2,17 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, UserPlus, Sparkles, Tag } from 'lucide-react';
 import { RiziaLogo } from '../components/RiziaLogo';
+import * as api from '../utils/api';
 
 interface SignupProps {
-  onSignup: (user: any) => void;
+  onSignup: (user: any, token: string) => void;
 }
 
 export default function Signup({ onSignup }: SignupProps) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,25 +22,28 @@ export default function Signup({ onSignup }: SignupProps) {
 
   const categories = ['Concert', 'Comedy', 'Dance', 'Art', 'Literature', 'Festival'];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     
-    // Create user object
-    const user = {
-      id: Date.now().toString(),
-      name: formData.name,
-      email: formData.email,
-      category: formData.category,
-    };
+    try {
+      const response = await api.signup(formData.email, formData.password, formData.name);
+      
+      const userData = {
+        id: response.profile.id,
+        name: response.profile.name,
+        email: response.profile.email,
+      };
 
-    // Save to localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    users.push({ ...user, password: formData.password });
-    localStorage.setItem('users', JSON.stringify(users));
-
-    // Login user
-    onSignup(user);
-    navigate('/dashboard');
+      onSignup(userData, response.session.access_token);
+      navigate('/dashboard');
+    } catch (err: any) {
+      console.error('Signup error:', err);
+      setError(err.message || 'Signup failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,6 +69,13 @@ export default function Signup({ onSignup }: SignupProps) {
             <h1 className="text-gray-900 dark:text-white mb-2 text-3xl">Join Rizia</h1>
             <p className="text-gray-600 dark:text-gray-400">Create your account and start discovering events</p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm">
+              {error}
+            </div>
+          )}
           
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Full Name Input */}

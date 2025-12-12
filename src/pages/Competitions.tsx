@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { CompetitionCard } from '../components/CompetitionCard';
-import { mockEvents, getEventsByCity } from '../data/mockData';
+import * as api from '../utils/api';
 import { Filter, MapPin } from 'lucide-react';
 
 interface CompetitionsProps {
@@ -14,14 +14,31 @@ interface CompetitionsProps {
 export default function Competitions({ user, selectedCity, onChangeCity }: CompetitionsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('all');
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const categories = ['All', 'Concert', 'Comedy', 'Dance', 'Art', 'Literature', 'Music Festival', 'Festival'];
 
-  // Filter by city first
-  const cityEvents = selectedCity ? getEventsByCity(selectedCity) : mockEvents;
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const fetchedEvents = await api.getEvents(selectedCity || undefined);
+        setEvents(fetchedEvents || []);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        setEvents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Then filter by category
-  const filteredEvents = cityEvents.filter((event) => {
+    fetchEvents();
+  }, [selectedCity]);
+
+  // Filter by category
+  const filteredEvents = events.filter((event) => {
+    if (!event) return false; // Filter out null/undefined events
     if (selectedCategory === 'All') return true;
     return event.category === selectedCategory;
   });

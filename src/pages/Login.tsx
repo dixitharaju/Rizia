@@ -2,49 +2,46 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn, Sparkles, Shield, User } from 'lucide-react';
 import { RiziaLogo } from '../components/RiziaLogo';
+import * as api from '../utils/api';
 
 interface LoginProps {
-  onLogin: (user: any, isAdmin?: boolean) => void;
+  onLogin: (user: any, token: string, isAdmin?: boolean) => void;
 }
 
 export default function Login({ onLogin }: LoginProps) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     loginType: 'user' // 'user' or 'admin'
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     
-    // Check if admin login
-    if (formData.loginType === 'admin') {
-      if (formData.email === 'admin@rizia.com' && formData.password === 'admin123') {
-        const adminUser = {
-          id: 'admin',
-          name: 'Admin',
-          email: formData.email,
-        };
-        onLogin(adminUser, true);
-        navigate('/admin/dashboard');
-        return;
-      } else {
-        alert('Invalid admin credentials');
-        return;
-      }
+    try {
+      const isAdmin = formData.loginType === 'admin';
+      const response = await api.signin(formData.email, formData.password, isAdmin);
+      
+      const userData = {
+        id: response.profile.id,
+        name: response.profile.name,
+        email: response.profile.email,
+      };
+
+      onLogin(userData, response.accessToken, isAdmin);
+      navigate(isAdmin ? '/admin/dashboard' : '/dashboard');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
-
-    // Regular user login
-    const mockUser = {
-      id: '1',
-      name: formData.email.split('@')[0],
-      email: formData.email,
-    };
-
-    onLogin(mockUser, false);
-    navigate('/dashboard');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +49,7 @@ export default function Login({ onLogin }: LoginProps) {
       ...formData,
       [e.target.name]: e.target.value
     });
+    setError(''); // Clear error when user types
   };
 
   return (
@@ -105,6 +103,13 @@ export default function Login({ onLogin }: LoginProps) {
             <h1 className="text-gray-900 dark:text-white mb-2 text-3xl">Welcome Back</h1>
             <p className="text-gray-600 dark:text-gray-400">Sign in to continue to Rizia</p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm">
+              {error}
+            </div>
+          )}
           
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Input */}
@@ -124,6 +129,7 @@ export default function Login({ onLogin }: LoginProps) {
                   className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
                   placeholder="you@example.com"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -145,6 +151,7 @@ export default function Login({ onLogin }: LoginProps) {
                   className="w-full pl-12 pr-12 py-3 bg-gray-50 dark:bg-gray-900/50 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
                   placeholder="••••••••"
                   required
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -170,10 +177,11 @@ export default function Login({ onLogin }: LoginProps) {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white rounded-xl hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg group"
+              disabled={loading}
+              className="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white rounded-xl hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg group disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <LogIn size={20} className="group-hover:translate-x-1 transition-transform" />
-              <span>Sign In</span>
+              <span>{loading ? 'Signing In...' : 'Sign In'}</span>
             </button>
 
             {/* Sign Up Link */}
