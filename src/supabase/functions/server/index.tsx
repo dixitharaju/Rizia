@@ -52,7 +52,7 @@ app.post("/make-server-6a8bd82a/signup", async (c) => {
       return c.json({ error: 'Admin signup is not allowed through this endpoint' }, 403);
     }
 
-    // Create user with Supabase Auth using service role
+    // Create user with Supabase Auth
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -61,7 +61,6 @@ app.post("/make-server-6a8bd82a/signup", async (c) => {
         category: category || '',
         role: 'user'
       },
-      // Automatically confirm the user's email since an email server hasn't been configured
       email_confirm: true
     });
 
@@ -70,17 +69,7 @@ app.post("/make-server-6a8bd82a/signup", async (c) => {
       return c.json({ error: `Signup error: ${error.message}` }, 400);
     }
 
-    // Store additional user data in KV store
-    if (data.user) {
-      await kv.set(`user:${data.user.id}`, {
-        id: data.user.id,
-        email: data.user.email,
-        name: name || email.split('@')[0],
-        category: category || '',
-        role: 'user',
-        createdAt: new Date().toISOString()
-      });
-    }
+    // User profile will be created automatically by database trigger
 
     return c.json({ 
       user: {

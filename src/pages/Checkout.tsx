@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { getEventById } from '../data/mockData';
-import { CreditCard, Lock, CheckCircle, Calendar, MapPin, Ticket, User, Mail, Phone, Shield } from 'lucide-react';
+import { CreditCard, Lock, CheckCircle, Calendar, MapPin, Ticket, User, Mail, Phone, Shield, Loader2 } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../utils/supabaseClient';
 
 interface CheckoutProps {
   user?: any;
@@ -17,6 +18,7 @@ export default function Checkout({ user }: CheckoutProps) {
   const [step, setStep] = useState(1);
   const [ticketCount, setTicketCount] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [processing, setProcessing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -37,15 +39,53 @@ export default function Checkout({ user }: CheckoutProps) {
   const convenienceFee = Math.round(subtotal * 0.05);
   const total = subtotal + convenienceFee;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step === 1) {
       setStep(2);
     } else if (step === 2) {
-      // Process payment
-      setTimeout(() => {
+      // Process dummy payment and save booking
+      setProcessing(true);
+      
+      try {
+        // Simulate payment processing
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Save booking to database if Supabase is configured
+        if (isSupabaseConfigured() && supabase) {
+          const { error: bookingError } = await supabase
+            .from('bookings')
+            .insert({
+              user_id: user?.id,
+              event_id: event.id,
+              event_name: event.title,
+              event_date: event.date,
+              event_time: event.time || 'TBA',
+              city: event.city,
+              venue: event.venue,
+              ticket_quantity: ticketCount,
+              price_per_ticket: pricePerTicket,
+              total_price: total,
+              booking_status: 'confirmed',
+              payment_method: paymentMethod
+            });
+
+          if (bookingError) {
+            console.error('Booking save error:', bookingError);
+            alert('Payment successful but failed to save booking. Please contact support.');
+          }
+        } else {
+          console.warn('Supabase not configured. Booking not saved to database.');
+        }
+
+        // Navigate to confirmation
         navigate(`/registration-confirmation/${id}`);
-      }, 1500);
+      } catch (err) {
+        console.error('Payment error:', err);
+        alert('Payment failed. Please try again.');
+      } finally {
+        setProcessing(false);
+      }
     }
   };
 
@@ -311,7 +351,11 @@ export default function Checkout({ user }: CheckoutProps) {
                       <>Continue to Payment</>
                     ) : (
                       <>
-                        <Lock size={20} />
+                        {processing ? (
+                          <Loader2 size={20} className="animate-spin" />
+                        ) : (
+                          <Lock size={20} />
+                        )}
                         Pay ₹{total}
                       </>
                     )}

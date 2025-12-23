@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff, UserPlus, Sparkles, Tag } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, UserPlus, Sparkles, Tag, Loader2 } from 'lucide-react';
 import { RiziaLogo } from '../components/RiziaLogo';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { supabase, hashPassword, isSupabaseConfigured } from '../utils/supabaseClient';
 
 interface SignupProps {
   onSignup: (user: any) => void;
@@ -13,7 +13,6 @@ export default function Signup({ onSignup }: SignupProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,70 +26,69 @@ export default function Signup({ onSignup }: SignupProps) {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess('');
-    
+
     try {
-      // Create user via Supabase backend
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-6a8bd82a/signup`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-            name: formData.name,
-            category: formData.category
-          })
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Signup failed');
+      // Check if Supabase is configured
+      if (!isSupabaseConfigured() || !supabase) {
+        setError('Database not configured. Please set up Supabase credentials.');
+        setLoading(false);
+        return;
       }
 
-      setSuccess('Account created successfully! Logging you in...');
+      // Check if user already exists
+      const { data: existingLogin } = await supabase
+        .from('users_login')
+        .select('email')
+        .eq('email', formData.email)
+        .single();
 
-      // Wait a moment to show success message
-      setTimeout(async () => {
-        // Now login the user
-        const loginResponse = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-6a8bd82a/login`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${publicAnonKey}`
-            },
-            body: JSON.stringify({
-              email: formData.email,
-              password: formData.password,
-              loginType: 'user'
-            })
-          }
-        );
+      if (existingLogin) {
+        setError('Email already registered. Please login instead.');
+        setLoading(false);
+        return;
+      }
 
-        const loginData = await loginResponse.json();
+      // Hash password
+      const passwordHash = await hashPassword(formData.password);
 
-        if (!loginResponse.ok) {
-          throw new Error('Signup successful, but login failed. Please login manually.');
-        }
+      // Insert into users_login table
+      const { data: loginData, error: loginError } = await supabase
+        .from('users_login')
+        .insert({
+          email: formData.email,
+          password_hash: passwordHash,
+          is_admin: false,
+        })
+        .select()
+        .single();
 
-        // Store session token
-        if (loginData.session?.access_token) {
-          localStorage.setItem('access_token', loginData.session.access_token);
-          localStorage.setItem('refresh_token', loginData.session.refresh_token);
-        }
+      if (loginError) throw loginError;
 
-        // Login user
-        onSignup(loginData.user);
-        navigate('/dashboard');
-      }, 1000);
+      // Insert into users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .insert({
+          login_id: loginData.id,
+          name: formData.name,
+          email: formData.email,
+          category: formData.category,
+        })
+        .select()
+        .single();
+
+      if (userError) throw userError;
+
+      // Create user object for session
+      const user = {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        category: userData.category,
+      };
+
+      // Login user
+      onSignup(user);
+      navigate('/dashboard');
     } catch (err: any) {
       console.error('Signup error:', err);
       setError(err.message || 'Failed to create account. Please try again.');
@@ -123,31 +121,14 @@ export default function Signup({ onSignup }: SignupProps) {
             <p className="text-gray-600 dark:text-gray-400">Create your account and start discovering events</p>
           </div>
           
-          {/* Error Message */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl">
-              <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <span>{error}</span>
-              </p>
-            </div>
-          )}
-
-          {/* Success Message */}
-          {success && (
-            <div className="mb-6 p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl">
-              <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>{success}</span>
-              </p>
-            </div>
-          )}
-          
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+                <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+              </div>
+            )}
+
             {/* Full Name Input */}
             <div>
               <label className="block text-gray-700 dark:text-gray-300 mb-2">
@@ -261,23 +242,10 @@ export default function Signup({ onSignup }: SignupProps) {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white rounded-xl hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg group disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white rounded-xl hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg group"
             >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Creating account...</span>
-                </>
-              ) : (
-                <>
-                  <UserPlus size={20} className="group-hover:scale-110 transition-transform" />
-                  <span>Create Account</span>
-                </>
-              )}
+              {loading ? <Loader2 size={20} className="animate-spin" /> : <UserPlus size={20} className="group-hover:scale-110 transition-transform" />}
+              <span>Create Account</span>
             </button>
 
             {/* Login Link */}
