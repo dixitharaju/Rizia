@@ -259,8 +259,6 @@ export default function Login({ onLogin }: LoginProps) {
             </p>
           </form>
 
-          {/* Demo Credentials */}
-          {/* ... remove this code ... */}
         </div>
 
         {/* Additional Info */}
