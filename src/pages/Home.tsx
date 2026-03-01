@@ -29,7 +29,7 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
       const data = await fetchActiveEvents();
       setEvents(data);
       
-      // Calculate category counts from real data
+      // Calculate category counts dynamically
       const counts = data.reduce((acc: Record<string, number>, event: any) => {
         const category = event.category;
         acc[category] = (acc[category] || 0) + 1;
@@ -92,7 +92,11 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
     { label: 'Live Events', value: events.length.toString(), icon: Ticket, gradient: 'from-pink-500 to-rose-500' },
     { label: 'Happy Attendees', value: '50K+', icon: Users, gradient: 'from-purple-500 to-indigo-500' },
     { label: 'Cities Covered', value: '20', icon: MapPin, gradient: 'from-blue-500 to-cyan-500' },
-    { label: 'Events This Month', value: '80+', icon: Calendar, gradient: 'from-orange-500 to-amber-500' }
+    { label: 'Events This Month', value: events.filter(e => {
+      const eventDate = new Date(e.date);
+      const now = new Date();
+      return eventDate.getMonth() === now.getMonth() && eventDate.getFullYear() === now.getFullYear();
+    }).length.toString(), icon: Calendar, gradient: 'from-orange-500 to-amber-500' }
   ];
 
   // Filter events by selected city

@@ -30,7 +30,7 @@ export default function ReviewSubmissions({ onLogout }: ReviewSubmissionsProps) 
     }
   };
 
-  // Mock submissions for review (this feature is not yet connected to database)
+  // Mock submissions for review (submissions feature not yet in database schema)
   const [submissions, setSubmissions] = useState([
     {
       id: '1',
@@ -152,7 +152,7 @@ export default function ReviewSubmissions({ onLogout }: ReviewSubmissionsProps) 
           <div className="mb-8">
             <h2 className="text-gray-900 mb-2">{competition?.title}</h2>
             <p className="text-gray-600">
-              {competition?.category} • Deadline: {competition?.deadline}
+              {competition?.category} • Deadline: {competition?.date}
             </p>
           </div>
 

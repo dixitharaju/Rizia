@@ -1,6 +1,6 @@
 // =====================================================
-// TYPE DEFINITIONS
-// These types are used throughout the application
+// TYPE DEFINITIONS ONLY
+// All data now comes from Supabase database
 // =====================================================
 
 export interface Event {
@@ -8,59 +8,60 @@ export interface Event {
   title: string;
   category: string;
   description: string;
-  fullDescription: string;
+  full_description?: string;
   city: string;
   venue: string;
-  venueAddress: string;
+  venue_address?: string;
   date: string;
   time: string;
   price: string;
   image?: string;
-  tags: string[];
+  tags?: string[];
   language?: string;
-  ageRestriction?: string;
+  age_restriction?: string;
   features?: string[];
   latitude?: number;
   longitude?: number;
+  is_active?: boolean;
+  created_at?: string;
 }
 
-export interface Registration {
+export interface Booking {
   id: string;
-  eventId: string;
-  eventName: string;
-  userId: string;
-  ticketCount: number;
-  totalAmount: string;
-  timestamp: string;
-  status: 'Confirmed' | 'Pending' | 'Cancelled';
+  user_id: string;
+  event_id: string;
+  event_name: string;
+  city: string;
+  venue: string;
+  event_date: string;
+  event_time: string;
+  ticket_count: number;
+  total_price: string;
+  booking_date: string;
+  status: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  city?: string;
+  created_at?: string;
 }
 
 export interface Submission {
   id: string;
-  competitionId: string;
-  competitionName: string;
-  userId: string;
+  competition_id: string;
+  competition_name: string;
+  user_id: string;
   title: string;
   description: string;
-  fileUrl: string;
+  file_url: string;
   timestamp: string;
   status: 'Submitted' | 'Under Review' | 'Accepted' | 'Rejected';
 }
 
-// For backward compatibility with existing code
+// For backward compatibility
 export type Competition = Event;
-
-// =====================================================
-// DEPRECATED FUNCTIONS - USE SUPABASE HELPERS INSTEAD
-// Import from: utils/supabaseHelpers.ts
-// =====================================================
-// - fetchAllEvents()
-// - fetchActiveEvents()
-// - fetchEventById(id)
-// - createEvent(eventData)
-// - updateEvent(id, eventData)
-// - deleteEvent(id)
-// - fetchAllBookings()
-// - fetchUserBookings(userId)
-// - createBooking(bookingData)
-// =====================================================
+export type Registration = Booking;
