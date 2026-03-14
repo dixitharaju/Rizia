@@ -33,7 +33,7 @@ export default function Competitions({ user, selectedCity, onChangeCity }: Compe
     }
   };
 
-  const categories = ['All', 'Concert', 'Comedy', 'Dance', 'Art', 'Literature', 'Music Festival', 'Festival'];
+  const categories = ['All', 'Drawing & Painting', 'Article Writing', 'Poetry', 'Skit / Drama', 'Choreography / Dance', 'Vlogs / Short Videos', 'Speech', 'Creative Arts', 'Literary & Oratory', 'Performing Arts', 'Digital Media'];
 
   // Filter by city first
   const cityEvents = selectedCity 
@@ -64,10 +64,10 @@ export default function Competitions({ user, selectedCity, onChangeCity }: Compe
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <h1 className="text-gray-900 mb-2">
-                  {selectedCity ? `Events in ${selectedCity}` : 'All Events'}
+                  {selectedCity ? `Competitions in ${selectedCity}` : 'All Competition Categories'}
                 </h1>
                 <p className="text-gray-600">
-                  Discover amazing experiences happening around you
+                  Explore Rizia competition categories and showcase your talents
                 </p>
               </div>
               {selectedCity && onChangeCity && (
@@ -86,7 +86,7 @@ export default function Competitions({ user, selectedCity, onChangeCity }: Compe
           <div className="bg-white rounded-2xl p-6 mb-8 border border-gray-200 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <Filter size={20} className="text-red-500" />
-              <span className="text-gray-900">Filter Events</span>
+              <span className="text-gray-900">Filter Categories</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -125,7 +125,7 @@ export default function Competitions({ user, selectedCity, onChangeCity }: Compe
           {/* Event Count */}
           <div className="mb-6">
             <p className="text-gray-600">
-              Showing {sortedEvents.length} event{sortedEvents.length !== 1 ? 's' : ''}
+              Showing {sortedEvents.length} competition{sortedEvents.length !== 1 ? 's' : ''}
               {selectedCategory !== 'All' && ` in ${selectedCategory}`}
               {selectedCity && ` in ${selectedCity}`}
             </p>
@@ -152,11 +152,11 @@ export default function Competitions({ user, selectedCity, onChangeCity }: Compe
           {sortedEvents.length === 0 && (
             <div className="text-center py-12 bg-white rounded-2xl border border-gray-200">
               <div className="text-6xl mb-4">🎭</div>
-              <h3 className="text-gray-900 mb-2">No Events Found</h3>
+              <h3 className="text-gray-900 mb-2">No Competitions Found</h3>
               <p className="text-gray-600 mb-6">
                 {selectedCity 
-                  ? `No events found in ${selectedCity} for this category. Try selecting a different category or city.`
-                  : 'No events found for this category. Try selecting a different category.'
+                  ? `No competitions found in ${selectedCity} for this category. Try selecting a different category or city.`
+                  : 'No competitions found for this category. Try selecting a different category.'
                 }
               </p>
               {selectedCity && onChangeCity && (

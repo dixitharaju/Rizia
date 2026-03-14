@@ -1,13 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Safely access environment variables with fallbacks
-const supabaseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || '';
-const supabaseAnonKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || '';
+// Supabase credentials
+// TODO: Replace with your actual anon public key from Supabase Dashboard
+// Go to: Project Settings > API > Project API keys > anon public key
+const supabaseUrl = 'https://ibzofkbppmhgfovlyhni.supabase.co';
+const supabaseAnonKey = 'sb_publishable_AQ6n1B9Wm4USyPflfhRBXA_SGNv83Kb';
 
-// Only create client if we have valid credentials
-export const supabase = (supabaseUrl && supabaseAnonKey) 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
+// Create Supabase client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Helper to check if Supabase is configured
 export const isSupabaseConfigured = () => {

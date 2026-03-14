@@ -1,6 +1,6 @@
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
-import { Sparkles, Users, Globe, Award, Target, Heart, Zap, Shield } from 'lucide-react';
+import { Church, Users, BookOpen, Award, Target, Heart, Sparkles, Trophy } from 'lucide-react';
 
 interface AboutUsProps {
   user?: any;
@@ -9,61 +9,88 @@ interface AboutUsProps {
 export default function AboutUs({ user }: AboutUsProps) {
   const values = [
     {
-      icon: Heart,
-      title: 'Customer First',
-      description: 'We put our customers at the heart of everything we do, ensuring the best event experience.',
+      icon: Church,
+      title: 'Faith Heritage',
+      description: 'Cultivate awareness of Church history among young minds and preserve our spiritual legacy.',
       gradient: 'from-pink-500 to-rose-500'
     },
     {
-      icon: Zap,
-      title: 'Innovation',
-      description: 'Constantly evolving our platform to bring you the latest in event discovery technology.',
+      icon: Sparkles,
+      title: 'Creative Expression',
+      description: 'Encourage creative faith expression through art, writing, performance, and digital media.',
       gradient: 'from-purple-500 to-violet-500'
     },
     {
-      icon: Shield,
-      title: 'Trust & Security',
-      description: 'Your data and transactions are protected with industry-leading security measures.',
+      icon: Users,
+      title: 'Community',
+      description: 'Bridge generations through shared heritage and build stronger diocesan connections.',
       gradient: 'from-indigo-500 to-blue-500'
     },
     {
-      icon: Globe,
-      title: 'Accessibility',
-      description: 'Making events accessible to everyone, everywhere across India.',
+      icon: Trophy,
+      title: 'Excellence',
+      description: 'Nurture talents for evangelization and celebrate outstanding creative achievements.',
       gradient: 'from-cyan-500 to-teal-500'
     }
   ];
 
   const stats = [
-    { value: '1M+', label: 'Happy Customers' },
-    { value: '10K+', label: 'Events Hosted' },
-    { value: '20+', label: 'Cities Covered' },
-    { value: '5M+', label: 'Tickets Sold' }
+    { value: '500+', label: 'Participants' },
+    { value: '7', label: 'Categories' },
+    { value: '4', label: 'Age Groups' },
+    { value: '100+', label: 'Parishes' }
+  ];
+
+  const categories = [
+    {
+      name: 'Creative Arts',
+      items: ['Drawing & Painting', 'Poetry'],
+      icon: '🎨',
+      gradient: 'from-pink-500 to-purple-500'
+    },
+    {
+      name: 'Literary & Oratory',
+      items: ['Article Writing', 'Speech'],
+      icon: '✍️',
+      gradient: 'from-purple-500 to-indigo-500'
+    },
+    {
+      name: 'Performing Arts',
+      items: ['Skit / Drama', 'Choreography / Dance'],
+      icon: '🎭',
+      gradient: 'from-indigo-500 to-blue-500'
+    },
+    {
+      name: 'Digital Media',
+      items: ['Vlogs / Short Videos'],
+      icon: '🎥',
+      gradient: 'from-blue-500 to-cyan-500'
+    }
   ];
 
   const team = [
     {
-      name: 'Priya Sharma',
-      role: 'CEO & Founder',
-      image: '👩‍💼',
+      name: 'Fr. Joseph Thomas',
+      role: 'Diocesan Coordinator',
+      image: '⛪',
       gradient: 'from-pink-500 to-purple-500'
     },
     {
-      name: 'Rahul Verma',
-      role: 'CTO',
-      image: '👨‍💻',
+      name: 'Sr. Mary Elizabeth',
+      role: 'Program Director',
+      image: '📖',
       gradient: 'from-purple-500 to-indigo-500'
     },
     {
-      name: 'Anjali Patel',
-      role: 'Head of Operations',
-      image: '👩‍💼',
+      name: 'John Paul',
+      role: 'Youth Ministry Lead',
+      image: '🙏',
       gradient: 'from-indigo-500 to-blue-500'
     },
     {
-      name: 'Vikram Singh',
-      role: 'Head of Marketing',
-      image: '👨‍💼',
+      name: 'Sarah Joseph',
+      role: 'Creative Arts Coordinator',
+      image: '🎨',
       gradient: 'from-blue-500 to-cyan-500'
     }
   ];
@@ -83,13 +110,13 @@ export default function AboutUs({ user }: AboutUsProps) {
                 <span className="text-sm text-purple-700 dark:text-purple-300">About Rizia</span>
               </div>
               <h1 className="text-gray-900 dark:text-white mb-6 text-4xl md:text-6xl">
-                Bringing Live Experiences <br />
+                Rediscovering Our Roots <br />
                 <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
-                  To Your Doorstep
+                  Turning Back to Church History
                 </span>
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-                Rizia is India's leading event discovery and ticketing platform, connecting millions of people with unforgettable experiences across the nation.
+                Rizia is more than just a competition; it is a spiritual and creative journey back to the foundations of our faith, organized at the Diocesan level.
               </p>
             </div>
 
@@ -112,23 +139,23 @@ export default function AboutUs({ user }: AboutUsProps) {
           <div className="container mx-auto max-w-6xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-gray-900 dark:text-white mb-6 text-3xl md:text-4xl">Our Story</h2>
+                <h2 className="text-gray-900 dark:text-white mb-6 text-3xl md:text-4xl">Our Mission</h2>
                 <div className="space-y-4 text-gray-600 dark:text-gray-400 text-lg leading-relaxed">
                   <p>
-                    Founded in 2020, Rizia started with a simple mission: to make event discovery and booking seamless for every Indian. We believed that finding and attending events shouldn't be complicated.
+                    By "Turning Back to Church History," we don't just look at the past; we find the inspiration to build our future. Rizia challenges participants to creatively express the foundations of Christian faith through diverse artistic mediums.
                   </p>
                   <p>
-                    Today, we're proud to be one of India's fastest-growing event platforms, hosting thousands of events every month across 20+ major cities. From concerts and comedy shows to workshops and festivals, we bring the best experiences right to your fingertips.
+                    From the courage of the early martyrs to the vibrant traditions that shape our worship today, we invite youth and adults alike to explore the rich tapestry of Church History and express it creatively.
                   </p>
                   <p>
-                    Our team of passionate individuals works tirelessly to ensure that every ticket booking is smooth, secure, and satisfying. We partner with the best event organizers, venues, and artists to bring you authentic, high-quality events.
+                    In a fast-changing world, knowing where we come from helps us understand who we are. "To be Christian is to be historical." History is the story of God working through people. By participating in Rizia, you help keep the flame of our heritage alive for the next generation.
                   </p>
                 </div>
               </div>
               <div className="relative">
                 <div className="aspect-square rounded-3xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 p-1">
                   <div className="w-full h-full rounded-3xl bg-white dark:bg-gray-900 flex items-center justify-center">
-                    <div className="text-9xl">🎭</div>
+                    <div className="text-9xl">⛪</div>
                   </div>
                 </div>
                 <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-pink-500 to-purple-500 rounded-3xl opacity-20 blur-2xl"></div>
@@ -188,23 +215,23 @@ export default function AboutUs({ user }: AboutUsProps) {
         <section className="py-20 px-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
           <div className="container mx-auto max-w-4xl text-center">
             <h2 className="text-white mb-6 text-3xl md:text-4xl">
-              Join Millions of Event Enthusiasts
+              Join the Rizia Movement
             </h2>
             <p className="text-white/90 text-xl mb-8">
-              Start discovering and booking amazing events in your city today!
+              Express your faith creatively and help preserve our Church heritage for future generations
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="/competitions"
                 className="px-8 py-4 bg-white text-purple-600 rounded-2xl hover:bg-gray-100 transition-all shadow-lg text-lg"
               >
-                Browse Events
+                Browse Categories
               </a>
               <a
                 href="/signup"
                 className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-2xl hover:bg-white/10 transition-all text-lg"
               >
-                Create Account
+                Register Now
               </a>
             </div>
           </div>

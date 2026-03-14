@@ -5,7 +5,7 @@ import { Footer } from '../components/Footer';
 import { CompetitionCard } from '../components/CompetitionCard';
 import { HeroCarousel } from '../components/HeroCarousel';
 import { fetchActiveEvents } from '../utils/supabaseHelpers';
-import { Sparkles, Trophy, Users, Award, ArrowRight, Star, CheckCircle, Calendar, DollarSign, Ticket, MapPin, Zap, Heart, TrendingUp } from 'lucide-react';
+import { Sparkles, Trophy, Users, Award, ArrowRight, Star, CheckCircle, Calendar, BookOpen, Church, Heart, Zap, Pen, Video, Mic, TrendingUp, Ticket, MapPin } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 
 interface HomeProps {
@@ -45,58 +45,89 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
 
   const categories = [
     { 
-      name: 'Concert', 
-      icon: '🎵', 
-      image: 'https://images.unsplash.com/photo-1642552556378-549e3445315e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMGNvbmNlcnQlMjBwZXJmb3JtZXJ8ZW58MXx8fHwxNzY0OTAyMjAxfDA&ixlib=rb-4.1.0&q=80&w=1080',
-      count: categoryCounts['Concert'] || 0,
-      gradient: 'from-blue-500 to-cyan-500'
-    },
-    { 
-      name: 'Comedy', 
-      icon: '😂', 
-      image: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=1080',
-      count: categoryCounts['Comedy'] || 0,
-      gradient: 'from-yellow-500 to-orange-500'
-    },
-    { 
-      name: 'Dance', 
-      icon: '💃', 
-      image: 'https://images.unsplash.com/photo-1698824554771-293b5dcc42db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYW5jZSUyMHBlcmZvcm1hbmNlJTIwc3RhZ2V8ZW58MXx8fHwxNzY0ODI1Nzc4fDA&ixlib=rb-4.1.0&q=80&w=1080',
-      count: categoryCounts['Dance'] || 0,
-      gradient: 'from-pink-500 to-rose-500'
-    },
-    { 
-      name: 'Art', 
+      name: 'Drawing & Painting', 
       icon: '🎨', 
       image: 'https://images.unsplash.com/photo-1683222042853-37cd29faf895?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnQlMjBwYWludGluZyUyMGNhbnZhc3xlbnwxfHx8fDE3NjQ4NDk1OTZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      count: categoryCounts['Art'] || 0,
+      count: categoryCounts['Drawing & Painting'] || 0,
       gradient: 'from-purple-500 to-violet-500'
     },
     { 
-      name: 'Literature', 
-      icon: '📚', 
+      name: 'Article Writing', 
+      icon: '✍️', 
       image: 'https://images.unsplash.com/photo-1612907260223-2c7aff7a7d3d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3cml0aW5nJTIwbm90ZWJvb2slMjBjcmVhdGl2ZXxlbnwxfHx8fDE3NjQ4NTE1NzV8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      count: categoryCounts['Literature'] || 0,
+      count: categoryCounts['Article Writing'] || 0,
       gradient: 'from-teal-500 to-emerald-500'
     },
     { 
-      name: 'Festival', 
-      icon: '🎪', 
-      image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1080',
-      count: categoryCounts['Festival'] || 0,
+      name: 'Poetry', 
+      icon: '📝', 
+      image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1080',
+      count: categoryCounts['Poetry'] || 0,
+      gradient: 'from-blue-500 to-cyan-500'
+    },
+    { 
+      name: 'Skit / Drama', 
+      icon: '🎭', 
+      image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=1080',
+      count: categoryCounts['Skit / Drama'] || 0,
+      gradient: 'from-pink-500 to-rose-500'
+    },
+    { 
+      name: 'Choreography / Dance', 
+      icon: '💃', 
+      image: 'https://images.unsplash.com/photo-1698824554771-293b5dcc42db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYW5jZSUyMHBlcmZvcm1hbmNlJTIwc3RhZ2V8ZW58MXx8fHwxNzY0ODI1Nzc4fDA&ixlib=rb-4.1.0&q=80&w=1080',
+      count: categoryCounts['Choreography / Dance'] || 0,
+      gradient: 'from-orange-500 to-amber-500'
+    },
+    { 
+      name: 'Vlogs / Short Videos', 
+      icon: '🎥', 
+      image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1080',
+      count: categoryCounts['Vlogs / Short Videos'] || 0,
       gradient: 'from-indigo-500 to-blue-500'
+    },
+    { 
+      name: 'Speech', 
+      icon: '🎤', 
+      image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=1080',
+      count: categoryCounts['Speech'] || 0,
+      gradient: 'from-yellow-500 to-orange-500'
+    },
+    { 
+      name: 'Creative Arts', 
+      icon: '🖌️', 
+      image: 'https://images.unsplash.com/photo-1761116182933-544a89286835?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmVhdGl2ZSUyMGFydHMlMjBwYWxldHRlJTIwYnJ1c2hlc3xlbnwxfHx8fDE3NzM1MTA0OTF8MA&ixlib=rb-4.1.0&q=80&w=1080',
+      count: categoryCounts['Creative Arts'] || 0,
+      gradient: 'from-fuchsia-500 to-pink-500'
+    },
+    { 
+      name: 'Literary & Oratory', 
+      icon: '📚', 
+      image: 'https://images.unsplash.com/photo-1585742162711-ed1a0fb549ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib29rJTIwbGlicmFyeSUyMHJlYWRpbmclMjBsaXRlcmF0dXJlfGVufDF8fHx8MTc3MzUxMDQ5Mnww&ixlib=rb-4.1.0&q=80&w=1080',
+      count: categoryCounts['Literary & Oratory'] || 0,
+      gradient: 'from-green-500 to-teal-500'
+    },
+    { 
+      name: 'Performing Arts', 
+      icon: '🎪', 
+      image: 'https://images.unsplash.com/photo-1761618291331-535983ae4296?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0aGVhdGVyJTIwc3RhZ2UlMjBwZXJmb3JtYW5jZXxlbnwxfHx8fDE3NzM0OTY2MzF8MA&ixlib=rb-4.1.0&q=80&w=1080',
+      count: categoryCounts['Performing Arts'] || 0,
+      gradient: 'from-red-500 to-orange-500'
+    },
+    { 
+      name: 'Digital Media', 
+      icon: '📱', 
+      image: 'https://images.unsplash.com/photo-1758553026412-bc1da0ebd366?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaWdpdGFsJTIwbWVkaWElMjBjYW1lcmElMjBwcm9kdWN0aW9ufGVufDF8fHx8MTc3MzUxMDQ5M3ww&ixlib=rb-4.1.0&q=80&w=1080',
+      count: categoryCounts['Digital Media'] || 0,
+      gradient: 'from-sky-500 to-blue-500'
     }
   ];
 
   const stats = [
-    { label: 'Live Events', value: events.length.toString(), icon: Ticket, gradient: 'from-pink-500 to-rose-500' },
-    { label: 'Happy Attendees', value: '50K+', icon: Users, gradient: 'from-purple-500 to-indigo-500' },
-    { label: 'Cities Covered', value: '20', icon: MapPin, gradient: 'from-blue-500 to-cyan-500' },
-    { label: 'Events This Month', value: events.filter(e => {
-      const eventDate = new Date(e.date);
-      const now = new Date();
-      return eventDate.getMonth() === now.getMonth() && eventDate.getFullYear() === now.getFullYear();
-    }).length.toString(), icon: Calendar, gradient: 'from-orange-500 to-amber-500' }
+    { label: 'Active Categories', value: '11', icon: Trophy, gradient: 'from-pink-500 to-rose-500' },
+    { label: 'Participants', value: '500+', icon: Users, gradient: 'from-purple-500 to-indigo-500' },
+    { label: 'Age Groups', value: '4', icon: Award, gradient: 'from-blue-500 to-cyan-500' },
+    { label: 'Total Submissions', value: events.length.toString(), icon: BookOpen, gradient: 'from-orange-500 to-amber-500' }
   ];
 
   // Filter events by selected city
@@ -142,7 +173,7 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
               </div>
               <h2 className="text-gray-900 dark:text-white mb-4 text-4xl md:text-5xl">Browse by Category</h2>
               <p className="text-xl text-gray-600 dark:text-gray-400">
-                Find events that match your interests
+                Choose your category and express your faith creatively
               </p>
             </div>
             
@@ -164,7 +195,7 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
                     <div className="text-5xl mb-3 group-hover:scale-125 transition-transform duration-300">{category.icon}</div>
                     <div className="text-white text-center mb-2 group-hover:text-lg transition-all">{category.name}</div>
                     <div className={`text-xs px-3 py-1 rounded-full bg-gradient-to-r ${category.gradient} text-white`}>
-                      {category.count} events
+                      {category.count} competitions
                     </div>
                   </div>
                 </Link>
@@ -180,12 +211,12 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-pink-100 rounded-full mb-4">
                   <TrendingUp size={18} className="text-pink-600" />
-                  <span className="text-sm text-pink-700">Hot Events</span>
+                  <span className="text-sm text-pink-700">Featured Categories</span>
                 </div>
                 <h2 className="text-gray-900 mb-2 text-4xl md:text-5xl">
-                  {selectedCity ? `Trending in ${selectedCity}` : 'Trending Events'}
+                  {selectedCity ? `Competitions in ${selectedCity}` : 'Featured Competitions'}
                 </h2>
-                <p className="text-gray-600 text-lg">Don't miss out on these popular events</p>
+                <p className="text-gray-600 text-lg">Express your faith through these creative categories</p>
               </div>
               <Link
                 to="/competitions"
@@ -218,7 +249,7 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
                 to="/competitions"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white rounded-full hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 transition-all shadow-lg"
               >
-                <span>View All Events</span>
+                <span>View All Categories</span>
                 <ArrowRight size={20} />
               </Link>
             </div>
@@ -230,12 +261,12 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-950/50 dark:to-cyan-950/50 rounded-full mb-4">
-                <Star size={18} className="text-blue-600 dark:text-blue-400" />
-                <span className="text-sm text-blue-700 dark:text-blue-300">Why Choose Us</span>
+                <Church size={18} className="text-blue-600 dark:text-blue-400" />
+                <span className="text-sm text-blue-700 dark:text-blue-300">Why Rizia</span>
               </div>
-              <h2 className="text-gray-900 dark:text-white mb-4 text-4xl md:text-5xl">Why Choose Rizia?</h2>
+              <h2 className="text-gray-900 dark:text-white mb-4 text-4xl md:text-5xl">Why Participate in Rizia?</h2>
               <p className="text-xl text-gray-600 dark:text-gray-400">
-                Your trusted platform for event discovery and booking
+                Rediscover our faith through creative expression
               </p>
             </div>
             
@@ -244,10 +275,10 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
                 <div className="relative">
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                    <Ticket className="text-white" size={28} />
+                    <BookOpen className="text-white" size={28} />
                   </div>
-                  <h3 className="text-gray-900 dark:text-white mb-3 text-xl">Easy Booking</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Quick and hassle-free ticket booking process with instant confirmation.</p>
+                  <h3 className="text-gray-900 dark:text-white mb-3 text-xl">Deepen Your Faith</h3>
+                  <p className="text-gray-600 dark:text-gray-400">Understand the "why" behind our traditions and explore Church history.</p>
                 </div>
               </div>
               
@@ -255,10 +286,10 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
                 <div className="relative">
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                    <Star className="text-white" size={28} />
+                    <Trophy className="text-white" size={28} />
                   </div>
-                  <h3 className="text-gray-900 dark:text-white mb-3 text-xl">Best Events</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Curated selection of the best events happening in your city.</p>
+                  <h3 className="text-gray-900 dark:text-white mb-3 text-xl">Showcase Talent</h3>
+                  <p className="text-gray-600 dark:text-gray-400">Share your God-given gifts with the entire Diocese.</p>
                 </div>
               </div>
               
@@ -266,10 +297,10 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
                 <div className="relative">
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                    <MapPin className="text-white" size={28} />
+                    <Users className="text-white" size={28} />
                   </div>
-                  <h3 className="text-gray-900 dark:text-white mb-3 text-xl">Multiple Cities</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Events across major cities in India with easy location-based discovery.</p>
+                  <h3 className="text-gray-900 dark:text-white mb-3 text-xl">Build Community</h3>
+                  <p className="text-gray-600 dark:text-gray-400">Connect with brothers and sisters from different parishes.</p>
                 </div>
               </div>
               
@@ -277,10 +308,10 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full opacity-10 group-hover:opacity-20 transition-opacity"></div>
                 <div className="relative">
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                    <CheckCircle className="text-white" size={28} />
+                    <Award className="text-white" size={28} />
                   </div>
-                  <h3 className="text-gray-900 dark:text-white mb-3 text-xl">Secure Payment</h3>
-                  <p className="text-gray-600 dark:text-gray-400">Safe and secure payment options with multiple payment methods.</p>
+                  <h3 className="text-gray-900 dark:text-white mb-3 text-xl">Win Rewards</h3>
+                  <p className="text-gray-600 dark:text-gray-400">Exciting prizes and certificates for winners in all categories!</p>
                 </div>
               </div>
             </div>
@@ -295,43 +326,30 @@ export default function Home({ user, selectedCity, onChangeCity }: HomeProps) {
           </div>
           <div className="container mx-auto px-4 text-center relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full mb-6">
-              <Zap size={18} />
-              <span className="text-sm">Get Started Today</span>
+              <Church size={18} />
+              <span className="text-sm">Turning Back to Church History</span>
             </div>
             <h2 className="text-white text-4xl md:text-5xl mb-6">
-              Ready to Explore Events?
+              Ready to Join Rizia?
             </h2>
             <p className="text-xl text-purple-100 mb-10 max-w-2xl mx-auto">
-              {selectedCity 
-                ? `Discover amazing events happening in ${selectedCity}`
-                : 'Select your city and start discovering amazing events'
-              }
+              Express your faith creatively and help keep the flame of our heritage alive for the next generation
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              {selectedCity ? (
-                <Link
-                  to="/competitions"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-purple-600 rounded-full hover:bg-purple-50 transition-all shadow-2xl hover:shadow-white/20 hover:scale-105"
-                >
-                  <span className="text-lg">Browse Events</span>
-                  <ArrowRight size={20} />
-                </Link>
-              ) : (
-                <button
-                  onClick={onChangeCity}
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-purple-600 rounded-full hover:bg-purple-50 transition-all shadow-2xl hover:shadow-white/20 hover:scale-105"
-                >
-                  <MapPin size={20} />
-                  <span className="text-lg">Select Your City</span>
-                </button>
-              )}
+              <Link
+                to="/competitions"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-purple-600 rounded-full hover:bg-purple-50 transition-all shadow-2xl hover:shadow-white/20 hover:scale-105"
+              >
+                <Trophy size={20} />
+                <span className="text-lg">Browse Categories</span>
+              </Link>
               {!user && (
                 <Link
                   to="/signup"
                   className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-full hover:bg-white/20 transition-all border-2 border-white/20"
                 >
                   <Heart size={20} />
-                  <span className="text-lg">Create Free Account</span>
+                  <span className="text-lg">Register Now</span>
                 </Link>
               )}
             </div>

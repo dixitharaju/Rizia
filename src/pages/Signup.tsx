@@ -20,7 +20,19 @@ export default function Signup({ onSignup }: SignupProps) {
     category: '',
   });
 
-  const categories = ['Concert', 'Comedy', 'Dance', 'Art', 'Literature', 'Festival'];
+  const categories = [
+    'Drawing & Painting', 
+    'Article Writing', 
+    'Poetry', 
+    'Skit / Drama', 
+    'Choreography / Dance', 
+    'Vlogs / Short Videos', 
+    'Speech',
+    'Creative Arts',
+    'Literary & Oratory',
+    'Performing Arts',
+    'Digital Media'
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +130,7 @@ export default function Signup({ onSignup }: SignupProps) {
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-200 dark:border-gray-700 rounded-3xl p-8 shadow-2xl">
           <div className="text-center mb-8">
             <h1 className="text-gray-900 dark:text-white mb-2 text-3xl">Join Rizia</h1>
-            <p className="text-gray-600 dark:text-gray-400">Create your account and start discovering events</p>
+            <p className="text-gray-600 dark:text-gray-400">Create your account and participate in Church History competitions</p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -261,12 +273,12 @@ export default function Signup({ onSignup }: SignupProps) {
         {/* Additional Benefits */}
         <div className="mt-6 grid grid-cols-3 gap-3">
           <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-2xl p-4 text-center border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl mb-2">🎫</div>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Easy Booking</p>
+            <div className="text-2xl mb-2">🎨</div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">11 Categories</p>
           </div>
           <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-2xl p-4 text-center border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl mb-2">⭐</div>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Best Events</p>
+            <div className="text-2xl mb-2">🏆</div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">Win Prizes</p>
           </div>
           <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-md rounded-2xl p-4 text-center border border-gray-200 dark:border-gray-700">
             <div className="text-2xl mb-2">🔒</div>

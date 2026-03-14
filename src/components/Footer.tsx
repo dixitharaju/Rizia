@@ -12,7 +12,7 @@ export function Footer() {
               <RiziaLogo size="md" />
             </Link>
             <p className="text-sm text-gray-400 mb-4">
-              Discover and book tickets to the best events happening in your city. From concerts to workshops, find it all on Rizia.
+              Celebrate Church History through creative expression. Join Rizia's diocesan-level competitions across 11 exciting categories.
             </p>
             <div className="flex items-center gap-3">
               <a href="#" className="w-9 h-9 flex items-center justify-center bg-gradient-to-br from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg transition-all shadow-md hover:shadow-lg">
@@ -33,7 +33,7 @@ export function Footer() {
           <div>
             <h3 className="text-white mb-4">Quick Links</h3>
             <ul className="space-y-3 text-sm">
-              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">Browse Events</Link></li>
+              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">Browse Categories</Link></li>
               <li><Link to="/about-us" className="hover:text-pink-400 transition-colors">About Us</Link></li>
               <li><Link to="/contact-us" className="hover:text-pink-400 transition-colors">Contact Us</Link></li>
               <li><Link to="/help" className="hover:text-pink-400 transition-colors">Help & FAQ</Link></li>
@@ -44,11 +44,12 @@ export function Footer() {
           <div>
             <h3 className="text-white mb-4">Categories</h3>
             <ul className="space-y-3 text-sm">
-              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">🎵 Concerts</Link></li>
-              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">😂 Comedy Shows</Link></li>
-              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">💃 Dance Events</Link></li>
-              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">🎨 Art Exhibitions</Link></li>
-              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">🎪 Festivals</Link></li>
+              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">🎨 Drawing & Painting</Link></li>
+              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">✍️ Article Writing</Link></li>
+              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">📝 Poetry</Link></li>
+              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">🎭 Skit / Drama</Link></li>
+              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">💃 Choreography / Dance</Link></li>
+              <li><Link to="/competitions" className="hover:text-pink-400 transition-colors">🎥 Vlogs / Short Videos</Link></li>
             </ul>
           </div>
           

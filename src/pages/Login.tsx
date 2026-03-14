@@ -24,50 +24,75 @@ export default function Login({ onLogin }: LoginProps) {
     setLoading(true);
     setError('');
 
+    console.log('🔐 Login attempt started...');
+    console.log('📧 Email:', formData.email);
+    console.log('👤 Login Type:', formData.loginType);
+
     try {
       // Check if Supabase is configured
       if (!isSupabaseConfigured() || !supabase) {
+        console.error('❌ Supabase not configured');
         setError('Database not configured. Please set up Supabase credentials.');
         setLoading(false);
         return;
       }
 
+      console.log('✅ Supabase configured');
+
       // Get login credentials from database
+      console.log('🔍 Querying users_login table...');
       const { data: loginData, error: loginError } = await supabase
         .from('users_login')
         .select('*')
         .eq('email', formData.email)
         .single();
 
+      console.log('📊 Query result:', { loginData, loginError });
+
       if (loginError || !loginData) {
+        console.error('❌ User not found in database');
+        console.error('Error details:', loginError);
         setError('Invalid email or password');
         setLoading(false);
         return;
       }
 
+      console.log('✅ User found in database');
+      console.log('🔑 User is_admin status:', loginData.is_admin);
+
       // Verify password
+      console.log('🔐 Verifying password...');
       const isPasswordValid = await verifyPassword(formData.password, loginData.password_hash);
+      console.log('🔐 Password valid:', isPasswordValid);
       
       if (!isPasswordValid) {
+        console.error('❌ Password verification failed');
         setError('Invalid email or password');
         setLoading(false);
         return;
       }
+
+      console.log('✅ Password verified');
 
       // Check if admin login matches
       if (formData.loginType === 'admin' && !loginData.is_admin) {
+        console.error('❌ User tried admin login but is not admin');
         setError('You do not have admin privileges');
         setLoading(false);
         return;
       }
 
       if (formData.loginType === 'user' && loginData.is_admin) {
+        console.error('❌ Admin tried user login');
         setError('Admin users must login through Admin Login');
         setLoading(false);
         return;
       }
 
+      console.log('✅ Login type matches user privileges');
+
       // Update last login
+      console.log('📝 Updating last login timestamp...');
       await supabase
         .from('users_login')
         .update({
@@ -77,17 +102,24 @@ export default function Login({ onLogin }: LoginProps) {
         .eq('id', loginData.id);
 
       // Get user profile data
+      console.log('👤 Fetching user profile...');
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('email', formData.email)
         .single();
 
+      console.log('👤 User profile:', { userData, userError });
+
       if (userError || !userData) {
+        console.error('❌ User profile not found');
+        console.error('Error details:', userError);
         setError('User profile not found');
         setLoading(false);
         return;
       }
+
+      console.log('✅ User profile found');
 
       // Create user object for session
       const user = {
@@ -97,17 +129,27 @@ export default function Login({ onLogin }: LoginProps) {
         category: userData.category,
       };
 
+      console.log('💾 Storing user session...');
+      console.log('User data:', user);
+      console.log('Is admin:', loginData.is_admin);
+
       // Login user
       onLogin(user, loginData.is_admin);
       
+      console.log('✅ Login successful!');
+      console.log('🚀 Navigating to dashboard...');
+      
       // Navigate based on user type
       if (loginData.is_admin) {
+        console.log('→ Redirecting to /admin/dashboard');
         navigate('/admin/dashboard');
       } else {
+        console.log('→ Redirecting to /dashboard');
         navigate('/dashboard');
       }
     } catch (err: any) {
-      console.error('Login error:', err);
+      console.error('💥 Login error:', err);
+      console.error('Error stack:', err.stack);
       setError('Login failed. Please try again.');
     } finally {
       setLoading(false);

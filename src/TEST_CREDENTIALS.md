@@ -2,6 +2,20 @@
 
 This document contains all the test credentials for local development and testing.
 
+## ⚠️ IMPORTANT: First Time Setup
+
+**Before you can login, you MUST run the SQL seed script in your Supabase database!**
+
+### Quick Setup Steps:
+1. Open your Supabase Dashboard → SQL Editor
+2. Run `/supabase/FIX_ADMIN_LOGIN.sql` (recommended) OR `/supabase/seed_test_users.sql`
+3. Verify users were created
+4. Start using the credentials below
+
+**If admin login doesn't work, see `/ADMIN_LOGIN_FIX_GUIDE.md`**
+
+---
+
 ## How to Set Up Test Users
 
 1. **Open your Supabase Dashboard**

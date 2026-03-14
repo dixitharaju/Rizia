@@ -161,9 +161,9 @@ CREATE TRIGGER update_bookings_updated_at BEFORE UPDATE ON public.bookings
 -- SEED DATA - Admin User
 -- =====================================================
 
--- Insert admin login credentials
+-- Insert admin login credentials (SHA-256 hash for 'admin123')
 INSERT INTO public.users_login (email, password_hash, is_admin, created_at)
-VALUES ('admin@rizia.com', '$2a$10$YourHashedPasswordHere', true, NOW())
+VALUES ('admin@rizia.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', true, NOW())
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert admin user profile
